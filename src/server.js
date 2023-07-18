@@ -1,18 +1,16 @@
 import express from 'express'
+import helmet from 'helmet'
 
-const bootServer = () => {
-    const app = express()
+const app = express()
 
-    app.use(express.json())
-    app.use(express.urlencoded({ extended: true }))
+app.use(helmet())
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
-    const PORT = process.env.PORT || 8080
+const PORT = process.env.PORT || 8080
 
-    app.get('/v1/status', (req, res) => res.status(200).json({ message: 'OK' }))
+app.get('/v1/status', (req, res) => res.status(200).json({ message: 'OK' }))
 
-    app.listen(PORT, () => {
-        console.log(`Hello ci-cd-github-actions-test-1, I'm running at :${PORT}`)
-    })
-}
-
-bootServer()
+app.listen(PORT, () => {
+    console.log(`Hello ci-cd-github-actions-test-1, I'm running at :${PORT}`)
+})
