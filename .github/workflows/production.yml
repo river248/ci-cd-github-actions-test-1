@@ -1,0 +1,70 @@
+# This is a basic workflow that is manually triggered
+
+name: Production
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+    workflow_dispatch:
+        # Inputs the workflow accepts.
+        inputs:
+            name:
+                # Friendly description to be shown in the UI instead of 'name'
+                description: 'CI/CD to greet'
+                # Default value if no value is explicitly provided
+                default: 'Production'
+                # Input has to be provided for the workflow to run
+                required: true
+                # The data type of the input
+                type: string
+jobs:
+    start_stage:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
+            - name: Send greeting
+              run: echo "Hello ${{ steps.split.outputs._0 }}, I'm in prodction stage"
+
+    deployment_check:
+        needs: start_stage
+        runs-on: ubuntu-latest
+        steps:
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
+            - name: Checkout branch
+              uses: actions/checkout@v3
+              with:
+                  ref: ${{ steps.split.outputs._0 }}
+            - name: Use Node.js 18
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+            - name: Trigger a deployment
+              run: |
+                  curl -d '{"repository":"ci-cd-github-actions-test-1","stage":"production","executionId":"${{ github.run_id }}","appMetricName":"default","deploymentInfo":{"deploymentEnvId":"${{secrets.RENDER_SERVER_PRODUCTION_ID}}","deploymentEnvKey":"${{secrets.RENDER_SERVER_PRODUCTION_KEY}}","commitId":"${{github.sha}}"}}' \
+                    -H "Authorization: ${{ secrets.RENDER_TOKEN }}" \
+                    -H "Content-Type: application/json" \
+                    -X POST https://ci-cd-github-actions-test.onrender.com/v1/deployment
+
+    finish_stage:
+        if: ${{ always() }}
+        needs: deployment_check
+        runs-on: ubuntu-latest
+        steps:
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
+            - name: Send greeting
+              run: echo "Hello ${{ steps.split.outputs._0 }}, I'm fisnishing production stage"
