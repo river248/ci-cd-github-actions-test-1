@@ -104,7 +104,6 @@ jobs:
                     -H "Content-Type: application/json" \
                     -X POST https://ci-cd-github-actions-test.onrender.com/v1/metric/push-metric
     unit_test_coverage:
-        if: ${{ always() }}
         needs: unit_tests
         runs-on: ubuntu-latest
         steps:
@@ -143,6 +142,7 @@ jobs:
               with:
                   ref: ${{ steps.split.outputs._0 }}
             - name: Trigger Test
+              if: jobs.code_quality.outcome != 'cancelled' && jobs.unit_tests.outcome != 'cancelled'
               run: |
                   curl -L \
                     -X POST \
