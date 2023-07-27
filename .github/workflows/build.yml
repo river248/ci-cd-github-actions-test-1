@@ -142,7 +142,7 @@ jobs:
               with:
                   ref: ${{ steps.split.outputs._0 }}
             - name: Trigger Test
-              if: jobs.code_quality.outcome != 'cancelled' && jobs.unit_tests.outcome != 'cancelled'
+              if: code_quality.outcome != 'cancelled' && unit_tests.outcome != 'cancelled'
               run: |
                   curl -L \
                     -X POST \
