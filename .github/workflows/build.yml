@@ -128,7 +128,7 @@ jobs:
                     -X POST https://ci-cd-github-actions-test.onrender.com/v1/metric/push-metric
     finish_stage:
         if: ${{ always() }}
-        needs: [code_quality, unit_tests, unit_test_coverage]
+        needs: [start_stage, code_quality, unit_tests, unit_test_coverage]
         runs-on: ubuntu-latest
         steps:
             - name: Slit ref to array.
