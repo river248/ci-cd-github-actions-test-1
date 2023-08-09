@@ -101,7 +101,7 @@ jobs:
               if: ${{ always() }}
               id: coverage_report
               run: |
-                  echo "coverage=$(toJSON($(cat ./coverage-summary.json)))" >> "$GITHUB_OUTPUT"
+                  echo "coverage=$(cat ./coverage-summary.json)" >> "$GITHUB_OUTPUT"
             - name: Push metric
               if: ${{ always() }}
               run: |
