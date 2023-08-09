@@ -121,6 +121,15 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 18
+            - name: Get code coverage
+              id: unit_test_coverage_report
+              run: |
+                  echo 'js_loc=$(xmllint --xpath "string(/coverage/project/metrics/@statements)" ./coverage/clover.xml)' >> "$GITHUB_OUTPUT"
+                  echo 'js_covered_lines=$(xmllint --xpath "string(/coverage/project/metrics/@coveredstatements)" ./coverage/clover.xml)' >> "$GITHUB_OUTPUT"
+            - name: Log report
+              run: |
+                  echo ${{steps.unit_test_coverage_report.outputs.js_loc}}
+                  echo ${{steps.unit_test_coverage_report.outputs.js_covered_lines}}
             - name: Push metric
               run: |
                   curl -d '{"repository":"ci-cd-github-actions-test-1","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Test Coverage","appMetricName":"default","data": "{\"actual\": 0, \"total\": 0}"}' \
