@@ -97,6 +97,10 @@ jobs:
               id: unit_test_report
               run: |
                   echo "report=$(cat ./junit.json)" >> "$GITHUB_OUTPUT"
+            - name: Get coverage report
+              if: ${{ always() }}
+              id: coverage_report
+              run: |
                   echo "coverage=$(cat ./coverage/coverage-summary.json)" >> "$GITHUB_OUTPUT"
             - name: Push metric
               if: ${{ always() }}
@@ -125,7 +129,7 @@ jobs:
             - name: Get code coverage
               id: unit_test_coverage_report
               run: |
-                  echo "${{ steps.unit_test_report.outputs.coverage }}" >> "$GITHUB_OUTPUT"
+                  echo "${{ steps.coverage_report.outputs.coverage }}" >> "$GITHUB_OUTPUT"
             - name: Push metric
               run: |
                   curl -d '{"repository":"ci-cd-github-actions-test-1","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Test Coverage","appMetricName":"default","data": "{\"actual\": ${{ fromJSON(steps.unit_test_coverage_report.outputs.report).total.lines.covered }}, \"total\": ${{ fromJSON(steps.unit_test_coverage_report.outputs.report).total.lines.total }}}"}' \
