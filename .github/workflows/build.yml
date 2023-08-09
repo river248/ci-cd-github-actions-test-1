@@ -124,13 +124,10 @@ jobs:
             - name: Get code coverage
               id: unit_test_coverage_report
               run: |
-                  echo "js_loc=$(cat ./coverage/clover.xml)" >> "$GITHUB_OUTPUT"
-            - name: Log report
-              run: |
-                  echo ${{steps.unit_test_coverage_report.outputs.js_loc}}
+                  echo "report=$(cat ./coverage/coverage-summary.json)" >> "$GITHUB_OUTPUT"
             - name: Push metric
               run: |
-                  curl -d '{"repository":"ci-cd-github-actions-test-1","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Test Coverage","appMetricName":"default","data": "{\"actual\": 0, \"total\": 0}"}' \
+                  curl -d '{"repository":"ci-cd-github-actions-test-1","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Test Coverage","appMetricName":"default","data": "{\"actual\": ${{ fromJSON(steps.unit_test_coverage_report.outputs.report).total.lines.covered }}, \"total\": ${{ fromJSON(steps.unit_test_coverage_report.outputs.report).total.lines.total }}}"}' \
                     -H "Content-Type: application/json" \
                     -X POST https://ci-cd-github-actions-test.onrender.com/v1/metric/push-metric
     finish_stage:
