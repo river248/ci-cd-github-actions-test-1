@@ -20,6 +20,18 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "jest": {
+    "reporters": [
+        "default",
+        "jest-junit",
+        "jest-html-reporters"
+    ],
+    "collectCoverageFrom": [
+        "**/*.{js,jsx}",
+        "!**/node_modules/**",
+        "!**/coverage/**"
+    ]
+},
   "dependencies": {
     "@babel/runtime": "^7.22.6",
     "axios": "^1.4.0",
