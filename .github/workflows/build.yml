@@ -97,6 +97,15 @@ jobs:
               id: unit_test_report
               run: |
                   echo "report=$(cat ./junit.json)" >> "$GITHUB_OUTPUT"
+            - name: Get coverage report
+              if: ${{ always() }}
+              id: coverage_report
+              run: |
+                  {
+                    echo 'report<<EOF'
+                    cat ./coverage-summary.json
+                    echo EOF
+                  } >> "$GITHUB_OUTPUT"
             - name: Push metric
               if: ${{ always() }}
               run: |
@@ -104,7 +113,7 @@ jobs:
                     -H "Content-Type: application/json" \
                     -X POST https://ci-cd-github-actions-test.onrender.com/v1/metric/push-metric
     unit_test_coverage:
-        needs: start_stage
+        needs: unit_tests
         runs-on: ubuntu-latest
         steps:
             - name: Slit ref to array.
@@ -121,22 +130,9 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 18
-            - name: Run unit test coverage
-              run: |
-                  npm ci
-                  npm run test
-            - name: Get coverage report
-              if: ${{ always() }}
-              id: coverage_report
-              run: |
-                  {
-                    echo 'report<<EOF'
-                    cat ./coverage-summary.json
-                    echo EOF
-                  } >> "$GITHUB_OUTPUT"
             - name: Push metric
               run: |
-                  curl -d '{"repository":"ci-cd-github-actions-test-1","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Test Coverage","appMetricName":"default","data": "{\"actual\": ${{ fromJSON(steps.coverage_report.outputs.report).total.lines.covered }}, \"total\": ${{ fromJSON(steps.coverage_report.outputs.report).total.lines.total }}}"}' \
+                  curl -d '{"repository":"ci-cd-github-actions-test-1","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Test Coverage","appMetricName":"default","data": "{\"actual\": ${{ fromJSON(jobs.unit_tests.steps.coverage_report.outputs.report).total.lines.covered }}, \"total\": ${{ fromJSON(jobs.unit_tests.steps.coverage_report.outputs.report).total.lines.total }}}"}' \
                     -H "Content-Type: application/json" \
                     -X POST https://ci-cd-github-actions-test.onrender.com/v1/metric/push-metric
     finish_stage:
