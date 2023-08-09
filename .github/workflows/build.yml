@@ -129,12 +129,12 @@ jobs:
               if: ${{ always() }}
               id: coverage_report
               run: |
-                  echo "report=$(cat ./coverage-summary.json)" >> "$GITHUB_OUTPUT"
-            - name: Push metric
-              run: |
-                  curl -d '{"repository":"ci-cd-github-actions-test-1","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Test Coverage","appMetricName":"default","data": "{\"actual\": ${{ fromJSON(steps.coverage_report.outputs.report).total.lines.covered }}, \"total\": ${{ fromJSON(steps.coverage_report.outputs.report).total.lines.total }}}"}' \
-                    -H "Content-Type: application/json" \
-                    -X POST https://ci-cd-github-actions-test.onrender.com/v1/metric/push-metric
+                  cat ./coverage-summary.json
+            # - name: Push metric
+            #   run: |
+            #       curl -d '{"repository":"ci-cd-github-actions-test-1","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Test Coverage","appMetricName":"default","data": "{\"actual\": ${{ fromJSON(steps.coverage_report.outputs.report).total.lines.covered }}, \"total\": ${{ fromJSON(steps.coverage_report.outputs.report).total.lines.total }}}"}' \
+            #         -H "Content-Type: application/json" \
+            #         -X POST https://ci-cd-github-actions-test.onrender.com/v1/metric/push-metric
     finish_stage:
         if: ${{ always() }}
         needs: [start_stage, code_quality, unit_tests, unit_test_coverage]
