@@ -125,7 +125,7 @@ jobs:
             - name: Get code coverage
               id: unit_test_coverage_report
               run: |
-                  echo "${{ unit_tests.steps.unit_test_report.outputs.coverage }}" >> "$GITHUB_OUTPUT"
+                  echo "${{ steps.unit_test_report.outputs.coverage }}" >> "$GITHUB_OUTPUT"
             - name: Push metric
               run: |
                   curl -d '{"repository":"ci-cd-github-actions-test-1","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Test Coverage","appMetricName":"default","data": "{\"actual\": ${{ fromJSON(steps.unit_test_coverage_report.outputs.report).total.lines.covered }}, \"total\": ${{ fromJSON(steps.unit_test_coverage_report.outputs.report).total.lines.total }}}"}' \
