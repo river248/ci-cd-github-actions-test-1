@@ -160,7 +160,7 @@ jobs:
                   echo status=$(curl -d '{"repository":"ci-cd-github-actions-test-1","stage":"build","executionId":"${{ github.run_id }}"}' \
                     -H "Authorization: ${{ secrets.EXECUTION_AUTH }}" \
                     -H "Content-Type: application/json" \
-                    -X POST https://ci-cd-github-actions-test.onrender.com/v1/metric/push-metric) >>  "$GITHUB_OUTPUT"
+                    -X POST https://ci-cd-github-actions-test.onrender.com/v1/execution/check-execution-status) >>  "$GITHUB_OUTPUT"
             - name: Trigger Test
               if: needs.code_quality.result != 'cancelled' && needs.unit_tests.result != 'cancelled'
               run: |
