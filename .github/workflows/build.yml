@@ -154,13 +154,21 @@ jobs:
               uses: actions/checkout@v3
               with:
                   ref: ${{ steps.split.outputs._0 }}
+            - name: Check execution status
+              id: execution
+              run: |
+                  echo status=$(curl -d '{"repository":"ci-cd-github-actions-test-1","stage":"build","executionId":"${{ github.run_id }}"}' \
+                    -H "Authorization: ${{ secrets.EXECUTION_AUTH }}" \
+                    -H "Content-Type: application/json" \
+                    -X POST https://ci-cd-github-actions-test.onrender.com/v1/metric/push-metric) >>  "$GITHUB_OUTPUT"
             - name: Trigger Test
               if: needs.code_quality.result != 'cancelled' && needs.unit_tests.result != 'cancelled'
               run: |
-                  curl -L \
-                    -X POST \
-                    -H "Accept: application/vnd.github+json" \
-                    -H "Authorization: ${{ secrets.BEARER_TOKEN }}" \
-                    -H "X-GitHub-Api-Version: 2022-11-28" \
-                    https://api.github.com/repos/river248/ci-cd-github-actions-test-1/actions/workflows/test.yml/dispatches \
-                    -d '{"ref":"${{ github.ref_name }}","inputs":{"name":"Test"}}'
+                  echo "${{ steps.execution.outputs.status }}"
+                  # curl -L \
+                  #   -X POST \
+                  #   -H "Accept: application/vnd.github+json" \
+                  #   -H "Authorization: ${{ secrets.BEARER_TOKEN }}" \
+                  #   -H "X-GitHub-Api-Version: 2022-11-28" \
+                  #   https://api.github.com/repos/river248/ci-cd-github-actions-test-1/actions/workflows/test.yml/dispatches \
+                  #   -d '{"ref":"${{ github.ref_name }}","inputs":{"name":"Test"}}'
