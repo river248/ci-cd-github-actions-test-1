@@ -162,9 +162,7 @@ jobs:
                     -H "Content-Type: application/json" \
                     -X POST https://ci-cd-github-actions-test.onrender.com/v1/execution/check-execution-status) >>  "$GITHUB_OUTPUT"
             - name: Trigger Test
-              if: |
-                  needs.code_quality.result != 'cancelled' && needs.unit_tests.result != 'cancelled' && needs.unit_test_coverage.result != 'cancelled' \
-                  && ((fromJSON(steps.execution.outputs.status).isSuccess == false && steps.split.outputs._0 != 'master') || fromJSON(steps.execution.outputs.status).isSuccess == true)
+              if: needs.code_quality.result != 'cancelled' && needs.unit_tests.result != 'cancelled' && needs.unit_test_coverage.result != 'cancelled' && ((fromJSON(steps.execution.outputs.status).isSuccess == false && steps.split.outputs._0 != 'master') || fromJSON(steps.execution.outputs.status).isSuccess == true)
               run: |
                   curl -L \
                     -X POST \
